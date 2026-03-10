@@ -1,0 +1,53 @@
+# =========================
+# Database
+# =========================
+db/*.db
+db/*.sqlite
+db/*.sqlite3
+
+# SQLite temp files
+*.db-journal
+*.sqlite-journal
+*.db-wal
+*.sqlite-wal
+*.db-shm
+*.sqlite-shm
+
+# =========================
+# Logs
+# =========================
+*.log
+logs/
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Editors
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# =========================
+# Python (por si agregas scripts)
+# =========================
+__pycache__/
+*.pyc
+
+# =========================
+# Build / temp
+# =========================
+tmp/
+temp/
+
+# =========================
+# Local overrides
+# =========================
+.env
+.env.local

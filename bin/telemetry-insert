@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+DB="$HOME/.local/share/shell-telemetry/db/telemetry.db"
+
+cmd="$1"
+exit_code="$2"
+duration="$3"
+cwd="$4"
+timestamp="$5"
+
+base_cmd=$(echo "$cmd" | awk '{print $1}')
+args=$(echo "$cmd" | cut -d' ' -f2-)
+
+sqlite3 "$DB" <<EOF
+INSERT INTO commands(
+ timestamp,
+ command,
+ base_cmd,
+ args,
+ cwd,
+ exit_code,
+ duration_ms,
+ host,
+ user
+)
+VALUES(
+ $timestamp,
+ "$cmd",
+ "$base_cmd",
+ "$args",
+ "$cwd",
+ $exit_code,
+ $duration,
+ "$(hostname)",
+ "$(whoami)"
+);
+EOF
