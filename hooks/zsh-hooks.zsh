@@ -10,6 +10,7 @@ preexec() {
 
 precmd() {
   [[ -z "$CMD_EXEC" ]] && return
+  [[ -n "$ZSH_SUBSHELL" && "$ZSH_SUBSHELL" -gt 0 ]] && return
 
   local exit_code=$?
   local end=$(date +%s%3N)
@@ -107,3 +108,13 @@ hist-stats() {
   "
 }
 
+hist-project() {
+  telemetry-query "
+  SELECT git_repo, COUNT(*) as commands
+  FROM commands
+  WHERE git_repo IS NOT NULL
+  GROUP BY git_repo
+  ORDER BY commands DESC
+  LIMIT 20;
+  "
+}

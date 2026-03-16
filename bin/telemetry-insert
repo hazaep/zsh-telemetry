@@ -1,8 +1,26 @@
 #!/usr/bin/env bash
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TELEMETRY_ROOT="$(dirname "$SCRIPT_DIR")"
-TELEMETRY_DB="$TELEMETRY_ROOT/db/telemetry.db"
-# TELEMETRY_DB="$SHELL_TELEMETRY/db/telemetry.db"
+
+DB_DIR="$TELEMETRY_ROOT/db"
+SCHEMA="$TELEMETRY_ROOT/schema/schema.sql"
+TELEMETRY_DB="$DB_DIR/telemetry.db"
+
+mkdir -p "$DB_DIR"
+
+# Crear DB si no existe
+if [[ ! -f "$TELEMETRY_DB" ]]; then
+    sqlite3 "$TELEMETRY_DB" < "$SCHEMA"
+
+    echo "[shell-telemetry] Nueva base de datos creada:"
+    echo "  $TELEMETRY_DB"
+fi
+
+#sqlite3 --noheader "$TELEMETRY_DB" <<EOF
+#PRAGMA journal_mode=WAL;
+#PRAGMA synchronous=NORMAL;
+#EOF
 
 cmd="$1"
 exit_code="$2"
@@ -13,6 +31,21 @@ timestamp="$5"
 base_cmd=$(echo "$cmd" | awk '{print $1}')
 args=$(echo "$cmd" | cut -d' ' -f2-)
 
+host=$(hostname)
+user=$(whoami)
+tty=$(tty 2>/dev/null)
+
+# detectar repo git
+git_repo=""
+git_branch=""
+
+if command -v git >/dev/null; then
+    git_repo=$(git rev-parse --show-toplevel 2>/dev/null)
+    git_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+fi
+
+session_id="${host}-$$"
+
 sqlite3 "$TELEMETRY_DB" <<EOF
 INSERT INTO commands(
  timestamp,
@@ -20,6 +53,10 @@ INSERT INTO commands(
  base_cmd,
  args,
  cwd,
+ git_repo,
+ git_branch,
+ tty,
+ session_id,
  exit_code,
  duration_ms,
  host,
@@ -31,9 +68,13 @@ VALUES(
  "$base_cmd",
  "$args",
  "$cwd",
+ "$git_repo",
+ "$git_branch",
+ "$tty",
+ "$session_id",
  $exit_code,
  $duration,
- "$(hostname)",
- "$(whoami)"
+ "$host",
+ "$user"
 );
 EOF
