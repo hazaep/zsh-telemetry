@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
-
-DB="$HOME/.local/share/shell-telemetry/db/telemetry.db"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TELEMETRY_ROOT="$(dirname "$SCRIPT_DIR")"
+TELEMETRY_DB="$TELEMETRY_ROOT/db/telemetry.db"
+# TELEMETRY_DB="$SHELL_TELEMETRY/db/telemetry.db"
 
 cmd="$1"
 exit_code="$2"
@@ -11,7 +13,7 @@ timestamp="$5"
 base_cmd=$(echo "$cmd" | awk '{print $1}')
 args=$(echo "$cmd" | cut -d' ' -f2-)
 
-sqlite3 "$DB" <<EOF
+sqlite3 "$TELEMETRY_DB" <<EOF
 INSERT INTO commands(
  timestamp,
  command,
