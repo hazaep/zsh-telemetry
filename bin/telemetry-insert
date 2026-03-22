@@ -48,33 +48,24 @@ session_id="${host}-$$"
 
 sqlite3 "$TELEMETRY_DB" <<EOF
 INSERT INTO commands(
- timestamp,
- command,
- base_cmd,
- args,
- cwd,
- git_repo,
- git_branch,
- tty,
- session_id,
- exit_code,
- duration_ms,
- host,
- user
+ timestamp, command, base_cmd, args, cwd,
+ git_repo, git_branch, tty, session_id,
+ exit_code, duration_ms, host, user
 )
-VALUES(
+VALUES (
  $timestamp,
- "$cmd",
- "$base_cmd",
- "$args",
- "$cwd",
- "$git_repo",
- "$git_branch",
- "$tty",
- "$session_id",
+ $(printf "'%s'" "$(echo "$cmd" | sed "s/'/''/g")"),
+ $(printf "'%s'" "$(echo "$base_cmd" | sed "s/'/''/g")"),
+ $(printf "'%s'" "$(echo "$args" | sed "s/'/''/g")"),
+ $(printf "'%s'" "$(echo "$cwd" | sed "s/'/''/g")"),
+ $(printf "'%s'" "$(echo "$git_repo" | sed "s/'/''/g")"),
+ $(printf "'%s'" "$(echo "$git_branch" | sed "s/'/''/g")"),
+ $(printf "'%s'" "$(echo "$tty" | sed "s/'/''/g")"),
+ $(printf "'%s'" "$(echo "$session_id" | sed "s/'/''/g")"),
  $exit_code,
  $duration,
- "$host",
- "$user"
+ $(printf "'%s'" "$(echo "$host" | sed "s/'/''/g")"),
+ $(printf "'%s'" "$(echo "$user" | sed "s/'/''/g")")
 );
 EOF
+
